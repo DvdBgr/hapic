@@ -66,7 +66,7 @@ For better performances with yaml module, you can install following (debian inst
 ## From source code
 
 ``` bash
-virtualenv -p /usr/bin/python3 venv
+python3 -m venv venv
 source venv/bin/activate
 python setup.py develop
 ```
