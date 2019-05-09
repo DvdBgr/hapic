@@ -54,7 +54,34 @@ class BottleContext(BaseContext):
         header_parameters = LowercaseKeysDict(
             [(k.lower(), v) for k, v in bottle.request.headers.items()]
         )
-        files_parameters = dict(bottle.request.files)
+        class FileParameters(object):
+
+            def __init__(self, file):
+                self.stream = stream  # input stream for the uploaded file
+                self.filename = filename  # name on client side
+                self.name = name  # name of form field
+                self.content_length = conten_length
+                self.content_type = content_type
+                self.mimetype = mimetype
+
+            def __get_file_parameters__(self, file):
+                data = self.stream.read(content_length)
+                if data:
+                    return data
+                else: raise IndexError
+
+        files = bottle.request.files.getall('file')
+        for file in files:
+            file_parameters = FileParameters(
+                stream=file.stream,
+                filename=file.filename,
+                name=file.name,
+                content_length=file.content_length
+            )
+            files_parameters.append(file_parameters)
+
+        if file.filename == '':
+            Return: 'No selected file'
 
         return RequestParameters(
             path_parameters=path_parameters,

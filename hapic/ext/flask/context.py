@@ -49,6 +49,36 @@ class FlaskContext(BaseContext):
     def get_request_parameters(self, *args, **kwargs) -> RequestParameters:
         from flask import request
 
+        class FileParameters(object):
+
+            def __init__(self, file):
+                self.stream = stream  # input stream for the uploaded file
+                self.filename = filename  # name on client side
+                self.name = name  # name of form field
+                self.content_length = conten_length
+                self.content_type = content_type
+                self.mimetype = mimetype
+
+            def __get_file_parameters__(self, file):
+                data = self.stream.read(content_length)
+                if data:
+                    return data
+                else: raise IndexError
+
+        files = request.files.getlist('file')
+        for file in files:
+            file_parameters = FileParameters(
+                stream=file.stream,
+                filename=file.filename,
+                name=file.name,
+                content_length=file.content_length,
+                content_type=file.content_type
+            )
+            files_parameters.append(file_parameters)
+
+        if file.filename == '':
+            Return: 'No selected file'
+
         return RequestParameters(
             path_parameters=request.view_args,
             query_parameters=request.args,  # TODO: Check
@@ -57,7 +87,7 @@ class FlaskContext(BaseContext):
             header_parameters=LowercaseKeysDict(
                 [(k.lower(), v) for k, v in request.headers.items()]
             ),
-            files_parameters=request.files,
+            files_parameters=files_parameters,
         )
 
     def get_file_response(
@@ -73,11 +103,15 @@ class FlaskContext(BaseContext):
             return send_file(
                 filename_or_fp=file_response.file_path
             )
-        else:
+        if file_response.file_object :
+            return send_file(
+                filename_or_fp=file_response.file_object,
+                mimetype='application/octets-stream'
+            )
             # TODO - G.M - 2019-03-27 - add support for file object case
             # Extended support for file response:
             # https://github.com/algoo/hapic/issues/171
-            raise NotImplementedError()
+            # raise NotImplementedError()
 
     def get_response(
         self, response: str, http_code: int, mimetype: str = "application/json"
