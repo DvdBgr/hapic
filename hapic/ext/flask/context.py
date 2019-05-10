@@ -18,6 +18,8 @@ from hapic.processor.main import ProcessValidationError
 from hapic.processor.main import RequestParameters
 from hapic.util import LowercaseKeysDict
 
+from werkzeug.utils import secure_filename
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -69,7 +71,7 @@ class FlaskContext(BaseContext):
         for file in files:
             file_parameters = FileParameters(
                 stream=file.stream,
-                filename=file.filename,
+                filename=secure_filename(file.filename),
                 name=file.name,
                 content_length=file.content_length,
                 content_type=file.content_type

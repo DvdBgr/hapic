@@ -71,7 +71,7 @@ class BottleContext(BaseContext):
                 else: raise IndexError
 
         files = bottle.request.files.getall('file')
-        for file in files:
+        for file in files:  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
             file_parameters = FileParameters(
                 stream=file.stream,
                 filename=file.filename,
