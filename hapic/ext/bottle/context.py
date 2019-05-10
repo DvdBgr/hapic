@@ -64,24 +64,29 @@ class BottleContext(BaseContext):
                 self.content_type = content_type
                 self.mimetype = mimetype
 
-            def __get_file_parameters__(self, file):
+            def _get_file_parameters(self, file):
                 data = self.stream.read(content_length)
                 if data:
                     return data
                 else: raise IndexError
 
+            def _save(self, file):
+                pass
+
         files = bottle.request.files.getall('file')
         for file in files:  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
             file_parameters = FileParameters(
-                stream=file.stream,
-                filename=file.filename,
+                stream=file.file,
+                filename=file.raw_filename,
                 name=file.name,
-                content_length=file.content_length
+                content_length=file.content_length,
+                content_type=file.content_type,
+                mimetype=content_type.partition(';')[0]
             )
             files_parameters.append(file_parameters)
 
         if file.filename == '':
-            Return: 'No selected file'
+            Return ('No selected file')
 
         return RequestParameters(
             path_parameters=path_parameters,
