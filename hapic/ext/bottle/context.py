@@ -74,8 +74,8 @@ class BottleContext(BaseContext):
                 pass
 
         files = bottle.request.files.getall('file')
-        for file in files:  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
-            file_parameters = FileParameters(
+        for name, file in files.items():  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
+            file_parameters[name] = FileParameters(
                 stream=file.file,
                 filename=file.raw_filename,
                 name=file.name,
@@ -83,7 +83,6 @@ class BottleContext(BaseContext):
                 content_type=file.content_type,
                 mimetype=content_type.partition(';')[0]
             )
-            files_parameters.append(file_parameters)
 
         if file.filename == '':
             Return ('No selected file')

@@ -68,15 +68,14 @@ class FlaskContext(BaseContext):
                 else: raise IndexError
 
         files = request.files.getlist('file')
-        for file in files:
-            file_parameters = FileParameters(
+        for name, file in files:
+            file_parameters[name] = FileParameters(
                 stream=file.stream,
                 filename=secure_filename(file.filename),
                 name=file.name,
                 content_length=file.content_length,
                 content_type=file.content_type
             )
-            files_parameters.append(file_parameters)
 
         if file.filename == '':
             Return: 'No selected file'
