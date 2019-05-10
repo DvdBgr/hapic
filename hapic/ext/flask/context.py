@@ -61,7 +61,7 @@ class FlaskContext(BaseContext):
                 self.content_type = content_type
                 self.mimetype = mimetype
 
-            def __get_file_parameters__(self, file):
+            def _get_file_parameters(self, file):
                 data = self.stream.read(content_length)
                 if data:
                     return data

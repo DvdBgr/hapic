@@ -63,12 +63,14 @@ class PyramidContext(BaseContext):
         forms_parameters = {}
         files = req.POST.getall('file')
         for name, file in files:
+            if not hasattr(file, 'file'):
+                raise TypeError('not a valid file field')
             file_parameters[name] = FileParameters(
                 stream=file.value,  # easiest way to gain access to the file’s data is via the value attribute: it returns the entire contents of the file as a string (https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/forms.html#file-uploads)
                 filename=file.filename,
                 name=file.name,
                 content_length=len(file.value),
-                content_type=req.headers.items().get('content-type', {}),  # not clear if content-type is content-type or mimetype
+                content_type=req.headers.items().get('content-type', 'application/octet-stream; charset=utf-8'),  # not clear if content-type is content-type or mimetype
                 mimetype=content_type.partition(';')[0]
             )
 
@@ -82,7 +84,7 @@ class PyramidContext(BaseContext):
                 self.content_type = content_type
                 self.mimetype = mimetype
 
-            def __get_file_parameters__(self, file):
+            def _get_file_parameters(self, file):
                 data = self.stream.read(content_length)
                 if data:
                     return data
