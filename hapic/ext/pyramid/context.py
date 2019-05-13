@@ -19,6 +19,8 @@ from hapic.processor.main import RequestParameters
 from hapic.util import LOGGER_NAME
 from hapic.util import LowercaseKeysDict
 
+from werkzeug.wsgi import LimitedStream
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -67,7 +69,7 @@ class PyramidContext(BaseContext):
             if not hasattr(file, 'file'):
                 raise TypeError('not a valid file field')
             file_parameters[name] = File(
-                stream=file.value,  # easiest way to gain access to the file’s data is via the value attribute: it returns the entire contents of the file as a string (https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/forms.html#file-uploads)
+                stream=LimitedStream(file.value),  # easiest way to gain access to the file’s data is via the value attribute: it returns the entire contents of the file as a string (https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/forms.html#file-uploads)
                 filename=file.filename,
                 name=file.name,
                 content_length=len(file.value),

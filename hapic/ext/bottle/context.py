@@ -21,6 +21,8 @@ from hapic.processor.main import ProcessValidationError
 from hapic.processor.main import RequestParameters
 from hapic.util import LowercaseKeysDict
 
+from werkzeug.wsgi import LimitedStream
+
 try:  # Python 3.5+
     from http import HTTPStatus
 except ImportError:
@@ -59,7 +61,7 @@ class BottleContext(BaseContext):
         files = bottle.request.files.getall('file')
         for name, file in files.items():  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
             file_parameters[name] = File(
-                stream=file.file,
+                stream=LimitedStream(file.file),
                 filename=file.raw_filename,
                 name=file.name,
                 content_length=file.content_length,
