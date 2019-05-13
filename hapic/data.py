@@ -32,11 +32,24 @@ class File(object):
         self.content_type = content_type
         self.mimetype = mimetype
 
-    def read(self, ):
+    def read(self):
         data = self.stream.read(content_length)
         if data:
             return data
         else: raise IndexError
+
+    def close(self):
+        if hasattr(self.file, 'close'):
+            self.file.close()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        data = self.file.read(self.buffer_size)
+        if data:
+            return data
+        raise StopIteration()
 
 
 class HapicFile(object):
