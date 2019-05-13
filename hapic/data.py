@@ -31,6 +31,7 @@ class File(object):
         self.content_length = conten_length
         self.content_type = content_type
         self.mimetype = mimetype
+        self.buffer_size = 1024
 
     def read(self):
         data = self.stream.read(content_length)
