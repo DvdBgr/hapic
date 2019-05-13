@@ -16,6 +16,8 @@ class HapicData(object):
 
 class File(object):
 
+    buffer_size = 1024
+
     def __init__(
         self,
         stream,
@@ -31,7 +33,6 @@ class File(object):
         self.content_length = conten_length
         self.content_type = content_type
         self.mimetype = mimetype
-        self.buffer_size = 1024
 
     def read(self):
         data = self.stream.read(content_length)
