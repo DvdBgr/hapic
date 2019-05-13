@@ -75,19 +75,6 @@ class PyramidContext(BaseContext):
                 mimetype=content_type.partition(';')[0]
             )
 
-            def __init__(self, file):
-                self.stream = stream  # input stream for the uploaded file
-                self.filename = filename  # name on client side
-                self.name = name  # name of form field
-                self.content_length = conten_length
-                self.content_type = content_type
-                self.mimetype = mimetype
-
-            def _get_file_parameters(self, file):
-                data = self.stream.read(content_length)
-                if data:
-                    return data
-                else: raise IndexError
               # if self.content_length > raise EOFError
 
         return RequestParameters(
