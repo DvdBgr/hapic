@@ -9,6 +9,7 @@ import typing
 from hapic.context import BaseContext
 from hapic.context import RouteRepresentation
 from hapic.data import HapicFile
+from hapic.data import File
 from hapic.decorator import DECORATION_ATTRIBUTE_NAME
 from hapic.decorator import DecoratedController
 from hapic.error.main import ErrorBuilderInterface
@@ -65,7 +66,7 @@ class PyramidContext(BaseContext):
         for name, file in files:
             if not hasattr(file, 'file'):
                 raise TypeError('not a valid file field')
-            file_parameters[name] = FileParameters(
+            file_parameters[name] = File(
                 stream=file.value,  # easiest way to gain access to the file’s data is via the value attribute: it returns the entire contents of the file as a string (https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/forms.html#file-uploads)
                 filename=file.filename,
                 name=file.name,
@@ -73,8 +74,6 @@ class PyramidContext(BaseContext):
                 content_type=req.headers.items().get('content-type', 'application/octet-stream; charset=utf-8'),  # not clear if content-type is content-type or mimetype
                 mimetype=content_type.partition(';')[0]
             )
-
-        class FileParameters(object):
 
             def __init__(self, file):
                 self.stream = stream  # input stream for the uploaded file

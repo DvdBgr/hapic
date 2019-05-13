@@ -9,7 +9,8 @@ from multidict import MultiDict
 from hapic.context import BaseContext
 from hapic.context import HandledException
 from hapic.context import RouteRepresentation
-from hapic.data import HapicFile
+from hapic.data import HapicFil
+from hapic.data import File
 from hapic.decorator import DECORATION_ATTRIBUTE_NAME
 from hapic.decorator import DecoratedController
 from hapic.error.main import ErrorBuilderInterface
@@ -54,28 +55,10 @@ class BottleContext(BaseContext):
         header_parameters = LowercaseKeysDict(
             [(k.lower(), v) for k, v in bottle.request.headers.items()]
         )
-        class FileParameters(object):
-
-            def __init__(self, file):
-                self.stream = stream  # input stream for the uploaded file
-                self.filename = filename  # name on client side
-                self.name = name  # name of form field
-                self.content_length = conten_length
-                self.content_type = content_type
-                self.mimetype = mimetype
-
-            def _get_file_parameters(self, file):
-                data = self.stream.read(content_length)
-                if data:
-                    return data
-                else: raise IndexError
-
-            def _save(self, file):
-                pass
 
         files = bottle.request.files.getall('file')
         for name, file in files.items():  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
-            file_parameters[name] = FileParameters(
+            file_parameters[name] = File(
                 stream=file.file,
                 filename=file.raw_filename,
                 name=file.name,

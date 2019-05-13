@@ -10,6 +10,7 @@ from flask import send_from_directory
 from hapic.context import BaseContext
 from hapic.context import RouteRepresentation
 from hapic.data import HapicFile
+from hapic.data import File
 from hapic.decorator import DECORATION_ATTRIBUTE_NAME
 from hapic.decorator import DecoratedController
 from hapic.error.main import ErrorBuilderInterface
@@ -51,7 +52,7 @@ class FlaskContext(BaseContext):
     def get_request_parameters(self, *args, **kwargs) -> RequestParameters:
         from flask import request
 
-        class FileParameters(object):
+        class File(object):
 
             def __init__(self, file):
                 self.stream = stream  # input stream for the uploaded file
@@ -69,7 +70,7 @@ class FlaskContext(BaseContext):
 
         files = request.files.getlist('file')
         for name, file in files:
-            file_parameters[name] = FileParameters(
+            file_parameters[name] = File(
                 stream=file.stream,
                 filename=secure_filename(file.filename),
                 name=file.name,
