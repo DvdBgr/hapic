@@ -52,16 +52,20 @@ class FlaskContext(BaseContext):
     def get_request_parameters(self, *args, **kwargs) -> RequestParameters:
         from flask import request
 
+        transfer_encoding = request.headers.get("Transfer-Encoding", None)
+        chunked = transfer_encoding == "chunked"
+
         files = request.files.getlist('file')
         for name, file in files:
             if file.filename == '':
                 continue
             file_parameters[name] = File(
                 stream=file.stream,
+                file_path=None,
                 filename=secure_filename(file.filename),
                 name=file.name,
                 content_length=file.content_length,
-                content_type=file.content_type
+                content_type=file.content_type,
             )
 
         return RequestParameters(
@@ -88,7 +92,7 @@ class FlaskContext(BaseContext):
             return send_file(
                 filename_or_fp=file_response.file_path
             )
-        if file_response.file_object :
+        if file_response.file_object:  # and not chunked
             return send_file(
                 filename_or_fp=file_response.file_object,
                 mimetype='application/octets-stream'
