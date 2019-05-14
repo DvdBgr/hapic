@@ -54,6 +54,8 @@ class FlaskContext(BaseContext):
 
         files = request.files.getlist('file')
         for name, file in files:
+            if file.filename == '':
+                continue
             file_parameters[name] = File(
                 stream=file.stream,
                 filename=secure_filename(file.filename),
@@ -61,9 +63,6 @@ class FlaskContext(BaseContext):
                 content_length=file.content_length,
                 content_type=file.content_type
             )
-
-        if file.filename == '':
-            Return: 'No selected file'
 
         return RequestParameters(
             path_parameters=request.view_args,
@@ -78,7 +77,7 @@ class FlaskContext(BaseContext):
 
     def get_file_response(
         self,
-        file_response: HapicFile,
+        file_response: File,
         http_code: int
     ) -> "Response":
         if file_response.file_path:
@@ -110,6 +109,7 @@ class FlaskContext(BaseContext):
         if http_code == 204:
             del response.headers['content-type']
         return response
+        # How are range request handled?
 
     def get_validation_error_response(
         self,

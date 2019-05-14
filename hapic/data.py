@@ -20,12 +20,13 @@ class File(object):
 
     def __init__(
         self,
-        stream,
-        filename,
-        name,
-        content_length,
-        content_type,
-        mimetype
+        stream = None,
+        file_path = None,
+        filename = None,
+        name = None,
+        content_length = None,
+        content_type = None,
+        mimetype = None
     ):
         self.stream = stream  # input stream for the uploaded file
         self.filename = filename  # name on client side
@@ -40,7 +41,7 @@ class File(object):
             return data
         else: raise IndexError
 
-    def close(self):
+    def close(self):            # file-like object expose close() and read()
         if hasattr(self.file, 'close'):
             self.file.close()
 

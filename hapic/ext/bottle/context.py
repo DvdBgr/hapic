@@ -61,7 +61,7 @@ class BottleContext(BaseContext):
         files = bottle.request.files.getall('file')
         for name, file in files.items():  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
             file_parameters[name] = File(
-                stream=LimitedStream(file.file),
+                stream=LimitedStream(file.file),  # file/stream.save() to save
                 filename=file.raw_filename,
                 name=file.name,
                 content_length=file.content_length,
