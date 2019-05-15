@@ -212,19 +212,19 @@ class Processor(metaclass=abc.ABCMeta):
         error_message = None
         if not isinstance(data, HapicFile) or not isistance(data, File):
             error_message = "File should be File or HapicFile type"
-        elif data.file_path and data.file_object:
+        elif data.file_path and data.stream:
             error_message = "File should be either path or object, not both"
-        elif not data.file_path and not data.file_object:
+        elif not data.file_path and not data.stream:
             error_message = "File should be either path or object"
         elif data.file_path and not os.path.isfile(data.file_path):
             error_message = "File path is not correct, file do not exist"
-        elif data.file_object and not data.mimetype:
+        elif data.stream and not data.mimetype:
             error_message = "File object should have explicit mimetype"
         elif data.content_length and not isinstance(data.content_length, int):
             error_message = "Content length should be integer"
         elif data.content_length and data.content_length < 0:
             error_message = "Content length should positive or null integer"
-        elif data.last_modified and not isinstance(data.last_modified, datetime):
+        # elif data.last_modified and not isinstance(data.last_modified, datetime):
             error_message = "Last-modified value should be datetime type"
         return error_message
 
