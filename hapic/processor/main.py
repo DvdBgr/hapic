@@ -210,8 +210,8 @@ class Processor(metaclass=abc.ABCMeta):
         :return:
         """
         error_message = None
-        if not isinstance(data, HapicFile):
-            error_message = "File should be HapicFile type"
+        if not isinstance(data, HapicFile) or not isistance(data, File):
+            error_message = "File should be File or HapicFile type"
         elif data.file_path and data.file_object:
             error_message = "File should be either path or object, not both"
         elif not data.file_path and not data.file_object:

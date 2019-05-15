@@ -92,10 +92,10 @@ class FlaskContext(BaseContext):
             return send_file(
                 filename_or_fp=file_response.file_path
             )
-        if file_response.file_object:  # and not chunked
+        if file_response.stream:  # and not chunked
             return send_file(
-                filename_or_fp=file_response.file_object,
-                mimetype='application/octets-stream'
+                filename_or_fp=file_response.stream,
+                mimetype=file_response.mimetype
             )
             # TODO - G.M - 2019-03-27 - add support for file object case
             # Extended support for file response:
