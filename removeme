@@ -1,0 +1,37 @@
+class HelloResponseSchema(marshmallow.Schema): # schema of the API response
+    name = marshmallow.fields.String(required=True)
+    now = marshmallow.fields.DateTime(required=False)
+    greetings = marshmallow.fields.String(required=False)
+    size = marshmallow.fields.Integer(required=False)
+
+
+class UriPathSchema(marshmallow.Schema):  # schema describing the URI and allowed values
+    name = marshmallow.fields.String(required=True)
+    age = marshmallow.fields.Integer(required=False)
+
+@app.route('/hello/<name>')  # flask route. must always be before hapic decorators
+@hapic.with_api_doc()  # the first hapic decorator. Register the method for auto-documentation
+@hapic.input_path(UriPathSchema())  # validate the URI structure
+@hapic.output_body(HelloResponseSchema())  # define output structure
+def hello(name='<No name>', hapic_data=None):
+    return {
+        'name': name,
+        'now': datetime.now(),
+        'dummy': { 'some': 'dummy' }  # will be ignored
+    }
+
+class UriPathSchemaWithAge(marshmallow.Schema):  # schema describing the URI and allowed values
+    name = marshmallow.fields.String(required=True)
+    age = marshmallow.fields.Integer(required=False)
+
+@app.route('/hello/<name>/age/<age>')
+@hapic.with_api_doc()
+@hapic.input_path(UriPathSchemaWithAge())
+@hapic.output_body(HelloResponseSchema())
+def hello2(name='<No name>', age=42, hapic_data=None):
+    return {
+        'name': name,
+        'age': age,
+        'now': datetime.now(),
+        'dummy': { 'some': 'dummy' }  # will be ignored
+    }
