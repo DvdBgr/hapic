@@ -55,8 +55,8 @@ class File(object):
             return data
         raise StopIteration()
 
-    def save_by_chunk(self, path):
-        with open(path, "bw") as f:
+    def save_by_chunk(self, save_path):
+        with open(save_path, "bw") as f:
             chunk_size = 4096
             while True:
                 chunk = flask.request.stream.read(chunk_size)
