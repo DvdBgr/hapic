@@ -55,6 +55,16 @@ class File(object):
             return data
         raise StopIteration()
 
+    def save_by_chunk(self, path):
+        with open(path, "bw") as f:
+            chunk_size = 4096
+            while True:
+                chunk = flask.request.stream.read(chunk_size)
+                if not validate_checksum_chunk():
+                    if len(chunk) == 0:  # or use LimitedStream
+                        return
+                f.write(chunk)
+
 
 class HapicFile(object):
     def __init__(
