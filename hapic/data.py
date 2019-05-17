@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 import typing
 import urllib.parse
+from datetime import datetime
 
 
 class HapicData(object):
@@ -14,9 +14,11 @@ class HapicData(object):
         self.files = {}
 
 
-class File(object):
+class File(HapicFile):
 
-    buffer_size = 1024
+    import hashlib
+    buffer_size = 1024  # iterate size
+    chunk_size = 4096   # chunk to write size
 
     def __init__(
         self,
@@ -35,9 +37,12 @@ class File(object):
         self.content_length = content_length
         self.content_type = content_type
         self.mimetype = mimetype
+        self._hash = hashlib.sha1()
+        # self.environ = environ  # wsgi env
 
     def read(self):
         data = self.stream.read(content_length)
+        self._hash.update(data)
         if data:
             return data
         else: raise IndexError
@@ -50,11 +55,18 @@ class File(object):
         return self
 
     def next(self):
-        data = self.file.read(self.buffer_size)
+        data = self.stream.read(self.buffer_size)
         if data:
             return data
         raise StopIteration()
 
+    def save_by_chunk(self, stream, SERVE_FOLDER):
+        with open(SERVE_FOLDER, "bw") as f:
+            while True:
+                chunk = stream.read(chunk_size)
+                if len(chunk) == 0:
+                    return
+                f.write(chunk)
 
 class HapicFile(object):
     def __init__(
@@ -67,8 +79,8 @@ class HapicFile(object):
         last_modified: datetime = None,
         as_attachment: bool = False,
     ):
-        self.file_path = file_path
-        self.file_object = file_object
+        self.file_path = File.file_path  # child(File).attr ?
+        self.file_object = File.file_object
         self.filename = filename
         self.mimetype = mimetype
         self.as_attachment = as_attachment
