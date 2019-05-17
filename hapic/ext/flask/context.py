@@ -29,6 +29,7 @@ except ImportError:
 
 if typing.TYPE_CHECKING:
     from flask import Response
+    from hapic.context import HandledException  # noqa: F401
 
 # flask regular expression to locate url parameters
 FLASK_RE_PATH_URL = re.compile(r"<(?:[^:<>]+:)?([^<>]+)>")
@@ -43,9 +44,7 @@ class FlaskContext(BaseContext):
         debug: bool = False,
     ):
         super().__init__(processor_class, default_error_builder)
-        self._handled_exceptions = (
-            []
-        )  # type: typing.List[HandledException]  # nopep8
+        self._handled_exceptions = []  # type: typing.List[HandledException]
         self.app = app
         self.debug = debug
 
@@ -97,36 +96,29 @@ class FlaskContext(BaseContext):
                 filename_or_fp=file_response.stream,
                 mimetype=file_response.mimetype
             )
-            # TODO - G.M - 2019-03-27 - add support for file object case
-            # Extended support for file response:
-            # https://github.com/algoo/hapic/issues/171
-            # raise NotImplementedError()
 
     def get_response(
         self, response: str, http_code: int, mimetype: str = "application/json"
     ) -> "Response":
         from flask import Response
+
         response = Response(response=response, mimetype=mimetype, status=http_code)
         # INFO - G.M - 2019-04-01 - Response object of flask always setup content-type
         # even when http_code is 204 NO-CONTENT
         # this is a fix to have correct behaviour with 204 response.
         if http_code == 204:
-            del response.headers['content-type']
+            del response.headers["content-type"]
         return response
         # How are range request handled?
 
     def get_validation_error_response(
-        self,
-        error: ProcessValidationError,
-        http_code: HTTPStatus = HTTPStatus.BAD_REQUEST,
+        self, error: ProcessValidationError, http_code: HTTPStatus = HTTPStatus.BAD_REQUEST
     ) -> typing.Any:
         from flask import Response
 
         dumped_error = self._get_dumped_error_from_validation_error(error)
         return Response(
-            response=json.dumps(dumped_error),
-            mimetype="application/json",
-            status=int(http_code),
+            response=json.dumps(dumped_error), mimetype="application/json", status=int(http_code)
         )
 
     def find_route(self, decorated_controller: "DecoratedController"):
@@ -135,9 +127,7 @@ class FlaskContext(BaseContext):
             if route.endpoint not in self.app.view_functions:
                 continue
             route_callback = self.app.view_functions[route.endpoint]
-            route_token = getattr(
-                route_callback, DECORATION_ATTRIBUTE_NAME, None
-            )
+            route_token = getattr(route_callback, DECORATION_ATTRIBUTE_NAME, None)
             match_with_wrapper = route_callback == reference.wrapper
             match_with_wrapped = route_callback == reference.wrapped
             match_with_token = route_token == reference.token
@@ -145,9 +135,7 @@ class FlaskContext(BaseContext):
             # FIXME - G.M - 2017-12-04 - return list instead of one method
             # This fix, return only 1 allowed method, change this when
             # RouteRepresentation is adapted to return multiples methods.
-            method = [
-                x for x in route.methods if x not in ["OPTIONS", "HEAD"]
-            ][0]
+            method = [x for x in route.methods if x not in ["OPTIONS", "HEAD"]][0]
 
             if match_with_wrapper or match_with_wrapped or match_with_token:
                 return RouteRepresentation(
@@ -166,14 +154,9 @@ class FlaskContext(BaseContext):
         return isinstance(response, Response)
 
     def add_view(
-        self,
-        route: str,
-        http_method: str,
-        view_func: typing.Callable[..., typing.Any],
+        self, route: str, http_method: str, view_func: typing.Callable[..., typing.Any]
     ) -> None:
-        self.app.add_url_rule(
-            methods=[http_method], rule=route, view_func=view_func
-        )
+        self.app.add_url_rule(methods=[http_method], rule=route, view_func=view_func)
 
     def serve_directory(self, route_prefix: str, directory_path: str) -> None:
         if not route_prefix.endswith("/"):
