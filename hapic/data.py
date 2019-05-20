@@ -18,8 +18,8 @@ class HapicData(object):
 class File(HapicFile):
 
     import hashlib
-    buffer_size = 1024  # iterate size
-    chunk_size = 4096   # chunk to write size
+    buffer_size = 1024  # bytes held in memory during copy / iterate size
+    chunk_size = 4096   # write chunk size
 
     def __init__(
         self,
@@ -61,6 +61,10 @@ class File(HapicFile):
             return data
         raise StopIteration()
 
+    """:func:`copyfileobj`: https://docs.python.org/3/library/shutil.html#shutil.copyfileobj
+    [...] a negative length value means to copy the data without looping over the source data in chunks; by default the data
+    is read in chunks to avoid uncontrolled memory consumption. If the current file position of the fsrc object
+    is not 0, only the contents from the current file position to the end of the file will be copied."""
     def _save(self, stream, SERVE_FOLDER, buffer_size):
         copyfileobj(fsrc=stream, fdst=SERVE_FOLDER, length=buffer_size)
 
