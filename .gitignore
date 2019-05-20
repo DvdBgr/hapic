@@ -9,3 +9,5 @@ __pycache__
 /build
 /dist
 make_hapic_release
+**/test.py
+**/test
