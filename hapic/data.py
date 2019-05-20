@@ -2,6 +2,7 @@
 import typing
 import urllib.parse
 from datetime import datetime
+from shutil import copyfileobj
 
 
 class HapicData(object):
@@ -59,6 +60,9 @@ class File(HapicFile):
         if data:
             return data
         raise StopIteration()
+
+    def _save(self, stream, SERVE_FOLDER, buffer_size):
+        copyfileobj(fsrc=stream, fdst=SERVE_FOLDER, length=buffer_size)
 
     def save_by_chunk(self, stream, SERVE_FOLDER):
         with open(SERVE_FOLDER, "bw") as f:
