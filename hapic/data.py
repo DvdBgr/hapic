@@ -2,7 +2,7 @@
 import typing
 import urllib.parse
 from datetime import datetime
-from shutil import copyfileobj
+from shutil import copyfileobj, copyfileo
 
 
 class HapicData(object):
@@ -18,8 +18,8 @@ class HapicData(object):
 class File(HapicFile):
 
     import hashlib
-    buffer_size = 1024  # bytes held in memory during copy / iterate size
-    chunk_size = 4096   # write chunk size
+    buffer_size = 16 * 1024  # bytes held in memory during copy (default: 16KB) / iterate size
+    chunk_size = 4 * 1024  # write chunk size
 
     def __init__(
         self,
@@ -61,18 +61,19 @@ class File(HapicFile):
             return data
         raise StopIteration()
 
-    """:func:`copyfileobj`: https://docs.python.org/3/library/shutil.html#shutil.copyfileobj
-    [...] a negative length value means to copy the data without looping over the source data in chunks; by default the data
+    """:func:`copyfileobj`: https://github.com/python/cpython/blob/3.6/Lib/shutil.py#L76 https://docs.python.org/3/library/shutil.html#shutil.copyfileobj:
+    "[...] a negative length value means to copy the data without looping over the source data in chunks; by default the data
     is read in chunks to avoid uncontrolled memory consumption. If the current file position of the fsrc object
-    is not 0, only the contents from the current file position to the end of the file will be copied."""
-    def _save(self, stream, SERVE_FOLDER, buffer_size):
+    is not 0, only the contents from the current file position to the end of the file will be copied."
+    Similiar to save_by_chunk"""
+    def save_(self, stream, SERVE_FOLDER):   # rely on state
         copyfileobj(fsrc=stream, fdst=SERVE_FOLDER, length=buffer_size)
 
     def save_by_chunk(self, stream, SERVE_FOLDER):
         with open(SERVE_FOLDER, "bw") as f:
             while True:
                 chunk = stream.read(chunk_size)
-                if len(chunk) == 0:
+                if len(chunk) == 0:  # not chunk doesn't check for EOF
                     return
                 f.write(chunk)
 

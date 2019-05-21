@@ -55,7 +55,7 @@ class FlaskContext(BaseContext):
         chunked = transfer_encoding == "chunked"
 
         files = request.files.getlist('file')
-        for name, file in files:
+        for name, file in files:     # use comprenhesion list
             if file.filename == '':
                 continue
             file_parameters[name] = File(
