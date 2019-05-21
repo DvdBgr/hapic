@@ -2,7 +2,7 @@
 import typing
 import urllib.parse
 from datetime import datetime
-from shutil import copyfileobj, copyfileo
+from shutil import copyfileobj
 
 
 class HapicData(object):
