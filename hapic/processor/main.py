@@ -199,15 +199,15 @@ class Processor(metaclass=abc.ABCMeta):
         :return:
         """
         error_message = None
-        if not isinstance(data, HapicFile) or not isistance(data, File):
-            error_message = "File should be File or HapicFile type"
-        elif data.file_path and data.stream:
+        if not isinstance(data, HapicFile):
+           error_message = "File should be HapicFile type"
+        if data.file_path and data.file_object:
             error_message = "File should be either path or object, not both"
-        elif not data.file_path and not data.stream:
+        elif data.file_object and not data.mimetype:
             error_message = "File should be either path or object"
         elif data.file_path and not os.path.isfile(data.file_path):
             error_message = "File path is not correct, file do not exist"
-        elif data.stream and not data.mimetype:
+        elif data.file_object and not data.mimetype:
             error_message = "File object should have explicit mimetype"
         elif data.content_length and not isinstance(data.content_length, int):
             error_message = "Content length should be integer"

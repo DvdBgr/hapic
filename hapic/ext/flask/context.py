@@ -6,6 +6,8 @@ import typing
 from flask import Flask
 from flask import send_file
 from flask import send_from_directory
+from memory_profiler import profile
+from werkzeug import FileStorage
 
 from hapic.context import BaseContext
 from hapic.context import RouteRepresentation
@@ -53,19 +55,22 @@ class FlaskContext(BaseContext):
 
         transfer_encoding = request.headers.get("Transfer-Encoding", None)
         chunked = transfer_encoding == "chunked"
+        file_parameters = {}
 
-        files = request.files.getlist('file')
+        files = request.files.items()
         for name, file in files:     # use comprenhesion list
-            if file.filename == '':
-                continue
-            file_parameters[name] = File(
-                stream=file.stream,
-                file_path=None,
-                filename=secure_filename(file.filename),
-                name=file.name,
-                content_length=file.content_length,
-                content_type=file.content_type,
-            )
+            if isinstance(file, FileStorage):
+                if file.filename == '':  # FIXME
+                    continue
+
+                file_parameters[name] = File(
+                    stream=file.stream,
+                    file_path=None,
+                    filename=secure_filename(file.filename),
+                    name=file.name,
+                    content_length=file.content_length,
+                    content_type=file.content_type,
+                )
 
         return RequestParameters(
             path_parameters=request.view_args,
@@ -75,12 +80,12 @@ class FlaskContext(BaseContext):
             header_parameters=LowercaseKeysDict(
                 [(k.lower(), v) for k, v in request.headers.items()]
             ),
-            files_parameters=files_parameters,
+            files_parameters=file_parameters,  # already a dict
         )
 
     def get_file_response(
         self,
-        file_response: File,
+        file_response: HapicFile,  # rechange to File
         http_code: int
     ) -> "Response":
         if file_response.file_path:
@@ -88,12 +93,14 @@ class FlaskContext(BaseContext):
             # file_response
             # Extended support for file response:
             # https://github.com/algoo/hapic/issues/171
+            # @profile
             return send_file(
                 filename_or_fp=file_response.file_path
             )
-        if file_response.stream:  # and not chunked
+        if file_response.file_object:
+            # @profile
             return send_file(
-                filename_or_fp=file_response.stream,
+                filename_or_fp=file_response.file_object,  # rechange to stream
                 mimetype=file_response.mimetype
             )
 

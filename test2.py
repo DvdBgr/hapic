@@ -202,8 +202,8 @@ def retrieve_file(file_id, environ, hapic_data=None):
             return HapicFile(...)
  get_stdin() = wsgi.input/error 
  demander baptiste assignation chainée wsgi.input? + range request?
-# werkzeug encapsulate environ in request object and start_response in Response
-# WSGI spec doesn't support HTTP/1 chunked content-type -> bad idea anyway, not suported by HTTP/2"""
+ werkzeug encapsulate environ in request object and start_response in Response
+ WSGI spec doesn't support HTTP/1 chunked content-type -> bad idea anyway, not suported by HTTP/2"""
 hapic.set_context(FlaskContext(app, default_error_builder=MarshmallowDefaultErrorBuilder()))
 print(json.dumps(hapic.generate_doc(title='API Doc', description='doc desc.')))  # Generate the documentation
 app.run('127.0.0.1', 8081, debug=True)
