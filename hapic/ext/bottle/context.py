@@ -55,17 +55,17 @@ class BottleContext(BaseContext):
         header_parameters = LowercaseKeysDict(
             [(k.lower(), v) for k, v in bottle.request.headers.items()]
         )
-
         files = bottle.request.files.getall('file')
         for name, file in files.items():  # http://bottlepy.org/docs/dev/api.html#bottle.MultiDict.getall https://multidict.readthedocs.io/en/stable/
-            file_parameters[name] = File(
-                stream=LimitedStream(file.file),  # file/stream.save() to save
-                filename=file.raw_filename,
-                name=file.name,
-                content_length=file.content_length,
-                content_type=file.content_type,
-                mimetype=content_type.partition(';')[0]
-            )
+            if isinstance(file, FileUpload):   #  https://bottlepy.org/docs/dev/api.html#bottle.FileUpload.file
+                file_parameters[name] = File(
+                    stream=LimitedStream(file.file),  # file/stream.save() to save
+                    filename=file.raw_filename,
+                    name=file.name,
+                    content_length=file.content_length,
+                    content_type=file.content_type,
+                    mimetype=content_type.partition(';')[0]
+                )
 
         if file.filename == '':
             Return ('No selected file')
@@ -85,11 +85,18 @@ class BottleContext(BaseContext):
             # file_response
             # Extended support for file response:
             # https://github.com/algoo/hapic/issues/171
-            return bottle.static_file(file_response.file_path, root="/")
-        else:
-            # TODO - G.M - 2019-03-27 - add support for file object case
+            return bottle.static_file(
+                filename=file_response.filename, root=file_response.file_path)
+
+        elif file_response.file_object:
+            raise NotImplementedError()
+            """
+            return bottle.static_file(
+                file_response.file_object, root=file_response.file_path)
+            # TODO - G.M - 2019-03-27 - add support for file object case"""
             # Extended support for file response:
             # https://github.com/algoo/hapic/issues/171
+        else:
             raise NotImplementedError()
 
     def get_response(
@@ -136,7 +143,7 @@ class BottleContext(BaseContext):
         return BOTTLE_RE_PATH_URL.sub(r"{\1}", contextualised_rule)
 
     def by_pass_output_wrapping(self, response: typing.Any) -> bool:
-        if isinstance(response, bottle.HTTPResponse):
+        if isinstance(response, bottle.HTTPResponse):  # fileUpload
             return True
         return False
 
