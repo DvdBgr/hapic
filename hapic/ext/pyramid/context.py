@@ -69,12 +69,10 @@ class PyramidContext(BaseContext):
                 filename=file.filename,
                 name=file.name,
                 content_length=len(file.value),
-                content_type=req.headers.items().get('content-type', 'application/octet-stream; charset=utf-8'),
+                content_type=req.headers.items().get('content-type', 'application/octet-stream; charset=utf-8')
                 """not clear if content-type is content-type or mimetype
                 If content_type is not set, mimetype is automatically guessed (get_file_response)"""
-
-                mimetype=content_type.partition(';')[0]
-            )
+                mimetype=content_type.partition(';')[0])
 
               # if self.content_length > raise EOFError
 
