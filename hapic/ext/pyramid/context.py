@@ -64,15 +64,16 @@ class PyramidContext(BaseContext):
         for name, file in files:
             if not hasattr(file, 'file'):
                 raise TypeError('not a valid file field')
-            file_parameters[name] = File(
-                stream=LimitedStream(file.value),  # easiest way to gain access to the file’s data is via the value attribute: it returns the entire contents of the file as a string (https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/forms.html#file-uploads)
-                filename=file.filename,
-                name=file.name,
-                content_length=len(file.value),
-                content_type=req.headers.items().get('content-type', 'application/octet-stream; charset=utf-8')
-                """not clear if content-type is content-type or mimetype
-                If content_type is not set, mimetype is automatically guessed (get_file_response)"""
-                mimetype=content_type.partition(';')[0])
+            if hasattr(file, cgi.FieldStorage):
+                file_parameters[name] = File(
+                    stream=LimitedStream(file.value),  # content of file as a string https://docs.pylonsproject.org/projects/pylons-webframework/en/latest/forms.html#file-uploads
+                    filename=file.filename,
+                    name=file.name,
+                    content_length=len(file.value),
+                    content_type=req.headers.items().get('content-type', 'application/octet-stream; charset=utf-8'),
+                    mimetype=content_type.partition(';')[0]  # content-type or mimetype? If content_type None, mimetype is guessed (get_file_response)
+
+                )
 
               # if self.content_length > raise EOFError
 

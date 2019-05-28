@@ -105,17 +105,16 @@ class File(HapicFile):
     is not 0, only the contents from the current file position to the end of the file will be copied."
     Similiar to save_by_chunk"""
 
-    @staticmethod
-    def save_(self, stream, file_path):   # rely on state
-        copyfileobj(fsrc=stream, fdst=file_path, length=buffer_size)
+def save_(self, stream, file_path):   # rely on state
+    copyfileobj(fsrc=stream, fdst=file_path, length=buffer_size)
 
-    @staticmethod
-    def save_by_chunk(self, stream, file_path):
-        with open(file_path, "bw") as f:
-            while True:
-                chunk = stream.read(chunk_size)
-                if len(chunk) == 0:  # not chunk doesn't check for EOF
-                    return
-                f.write(chunk)
+def save_by_chunk(self, stream, file_path):
+    with open(file_path, "bw") as f:
+        while True:
+            chunk = stream.read(chunk_size)
+            if len(chunk) == 0:  # not chunk doesn't check for EOF
+                return
+            f.write(chunk)
+
 
 
