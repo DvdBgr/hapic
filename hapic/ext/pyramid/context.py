@@ -6,6 +6,9 @@ import re
 import traceback
 import typing
 
+from pyramid.response import FileIter, Response
+from werkzeug.wsgi import LimitedStream
+
 from hapic.context import BaseContext
 from hapic.context import RouteRepresentation
 from hapic.data import HapicFile
@@ -18,8 +21,6 @@ from hapic.processor.main import ProcessValidationError
 from hapic.processor.main import RequestParameters
 from hapic.util import LOGGER_NAME
 from hapic.util import LowercaseKeysDict
-
-from werkzeug.wsgi import LimitedStream
 
 try:  # Python 3.5+
     from http import HTTPStatus
@@ -115,9 +116,6 @@ class PyramidContext(BaseContext):
                 content_type=file_response.mimetype or None,
             )
         else:
-            from pyramid.response import FileIter
-            from pyramid.response import Response
-
             response = Response(status=http_code)
             response.content_type = file_response.mimetype
             response.app_iter = FileIter(file_response.file_object)
@@ -134,7 +132,6 @@ class PyramidContext(BaseContext):
     def get_validation_error_response(
         self, error: ProcessValidationError, http_code: HTTPStatus = HTTPStatus.BAD_REQUEST
     ) -> typing.Any:
-        from pyramid.response import Response
 
         dumped_error = self._get_dumped_error_from_validation_error(error)
         return Response(
@@ -182,7 +179,6 @@ class PyramidContext(BaseContext):
         return contextualised_rule
 
     def by_pass_output_wrapping(self, response: typing.Any) -> bool:
-        from pyramid.response import Response
 
         return isinstance(response, Response)
 
