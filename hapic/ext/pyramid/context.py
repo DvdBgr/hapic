@@ -54,7 +54,7 @@ class PyramidContext(BaseContext):
         req = args[-1]  # TODO : Check
         # TODO : move this code to check_json
         # same idea as in : https://bottlepy.org/docs/dev/_modules/bottle.html#BaseRequest.json
-        if req.body and req.content_type in ("application/json", "application/json-rpc"):
+        if req.content_type or req.body in ("application/json", "application/json-rpc"):
             json_body = req.json_body
             # TODO : raise exception if not correct , return 400 if uncorrect instead ?
         else:
